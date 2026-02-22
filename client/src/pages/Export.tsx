@@ -21,12 +21,25 @@ export default function Export() {
     if (!element) return;
 
     try {
-      const canvas = await html2canvas(element, {
+      // Create a temporary container for PDF generation to handle styling better
+      const pdfContainer = element.cloneNode(true) as HTMLElement;
+      pdfContainer.style.width = '210mm'; // A4 width
+      pdfContainer.style.padding = '20mm';
+      pdfContainer.style.background = 'white';
+      pdfContainer.style.position = 'absolute';
+      pdfContainer.style.left = '-9999px';
+      pdfContainer.style.top = '0';
+      document.body.appendChild(pdfContainer);
+
+      const canvas = await html2canvas(pdfContainer, {
         scale: 2,
         useCORS: true,
-        logging: false
+        logging: false,
+        windowWidth: 794, // ~210mm at 96dpi
       });
       
+      document.body.removeChild(pdfContainer);
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -38,7 +51,21 @@ export default function Export() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // Handle multi-page PDF if content is long
+      let heightLeft = pdfHeight;
+      let position = 0;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+      }
+
       pdf.save(`${novel.title}.pdf`);
     } catch (error) {
       console.error("Error generating PDF:", error);
