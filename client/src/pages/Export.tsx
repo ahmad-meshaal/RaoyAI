@@ -29,13 +29,33 @@ export default function Export() {
       pdfContainer.style.position = 'absolute';
       pdfContainer.style.left = '-9999px';
       pdfContainer.style.top = '0';
+      pdfContainer.style.direction = 'rtl'; // Ensure RTL for Arabic
+      pdfContainer.style.textAlign = 'right'; // Force right alignment
+      pdfContainer.classList.add('pdf-export-container');
+      
+      // Remove no-print elements from the clone
+      pdfContainer.querySelectorAll('.no-print').forEach(el => el.remove());
+      
       document.body.appendChild(pdfContainer);
 
+      // Fix specific RTL/Arabic issues in the clone
+      const textElements = pdfContainer.querySelectorAll('h1, h2, p, span, div');
+      textElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        htmlEl.style.direction = 'rtl';
+        htmlEl.style.textAlign = 'right';
+        htmlEl.style.unicodeBidi = 'bidi-override';
+        htmlEl.style.whiteSpace = 'pre-wrap';
+        htmlEl.style.wordBreak = 'break-word';
+      });
+
       const canvas = await html2canvas(pdfContainer, {
-        scale: 2,
+        scale: 3, // Higher scale for better text quality
         useCORS: true,
         logging: false,
         windowWidth: 794, // ~210mm at 96dpi
+        dir: 'rtl', // Tell html2canvas to use RTL
+        backgroundColor: '#ffffff'
       });
       
       document.body.removeChild(pdfContainer);
