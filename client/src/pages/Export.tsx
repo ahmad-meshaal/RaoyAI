@@ -3,8 +3,8 @@ import { LoadingPage } from "@/components/ui/Loading";
 import { Button } from "@/components/ui/button";
 import { useParams, Link } from "wouter";
 import { ArrowRight, Printer, FileText } from "lucide-react";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+// @ts-ignore
+import html2pdf from "html2pdf.js";
 
 export default function Export() {
   const { id } = useParams();
@@ -20,73 +20,23 @@ export default function Export() {
     const element = document.getElementById('printable-content');
     if (!element) return;
 
+    const opt = {
+      margin: 10,
+      filename: `${novel.title}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        letterRendering: true,
+        dir: 'rtl'
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
     try {
-      // Create a temporary container for PDF generation to handle styling better
-      const pdfContainer = element.cloneNode(true) as HTMLElement;
-      pdfContainer.style.width = '210mm'; // A4 width
-      pdfContainer.style.padding = '20mm';
-      pdfContainer.style.background = 'white';
-      pdfContainer.style.position = 'absolute';
-      pdfContainer.style.left = '-9999px';
-      pdfContainer.style.top = '0';
-      pdfContainer.style.direction = 'rtl'; // Ensure RTL for Arabic
-      pdfContainer.style.textAlign = 'right'; // Force right alignment
-      pdfContainer.classList.add('pdf-export-container');
-      
-      // Remove no-print elements from the clone
-      pdfContainer.querySelectorAll('.no-print').forEach(el => el.remove());
-      
-      document.body.appendChild(pdfContainer);
-
-      // Fix specific RTL/Arabic issues in the clone
-      const textElements = pdfContainer.querySelectorAll('h1, h2, p, span, div');
-      textElements.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.style.direction = 'rtl';
-        htmlEl.style.textAlign = 'right';
-        htmlEl.style.unicodeBidi = 'bidi-override';
-        htmlEl.style.whiteSpace = 'pre-wrap';
-        htmlEl.style.wordBreak = 'break-word';
-      });
-
-      const canvas = await html2canvas(pdfContainer, {
-        scale: 3, // Higher scale for better text quality
-        useCORS: true,
-        logging: false,
-        windowWidth: 794, // ~210mm at 96dpi
-        dir: 'rtl', // Tell html2canvas to use RTL
-        backgroundColor: '#ffffff'
-      });
-      
-      document.body.removeChild(pdfContainer);
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      // Handle multi-page PDF if content is long
-      let heightLeft = pdfHeight;
-      let position = 0;
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - pdfHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`${novel.title}.pdf`);
+      // Use html2pdf for better multi-page support
+      await html2pdf().set(opt).from(element).save();
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
