@@ -20,25 +20,34 @@ export default function Export() {
     const element = document.getElementById('printable-content');
     if (!element) return;
 
+    // Temporarily remove fixed positioning and high z-index during capture
+    const header = document.querySelector('.no-print') as HTMLElement;
+    if (header) header.style.display = 'none';
+
     const opt = {
-      margin: 10,
+      margin: [15, 15],
       filename: `${novel.title}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
         useCORS: true, 
         letterRendering: true,
-        dir: 'rtl'
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: document.documentElement.offsetWidth
       },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     try {
-      // Use html2pdf for better multi-page support
-      await html2pdf().set(opt).from(element).save();
+      await html2pdf().set(opt).from(element).toPdf().get('pdf').then((pdf: any) => {
+        // Optional: extra processing if needed
+      }).save();
     } catch (error) {
       console.error("Error generating PDF:", error);
+    } finally {
+      if (header) header.style.display = 'flex';
     }
   };
 
