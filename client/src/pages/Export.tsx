@@ -31,38 +31,51 @@ export default function Export() {
       html2canvas: { 
         scale: 2, 
         useCORS: true, 
-        letterRendering: true,
+        letterRendering: false,
         scrollX: 0,
         scrollY: 0,
         windowWidth: 1200,
-        logging: false,
+        logging: true,
         onclone: (clonedDoc: Document) => {
           const clonedElement = clonedDoc.getElementById('printable-content');
           if (clonedElement) {
+            // Force reset styles on the clone to ensure visibility
             clonedElement.style.paddingTop = '20px';
             clonedElement.style.marginTop = '0px';
             clonedElement.style.position = 'relative';
             clonedElement.style.display = 'block';
             clonedElement.style.backgroundColor = 'white';
             clonedElement.style.width = '1200px';
-            
-            // Critical fix for white pages: ensure text color is explicit and background is white
             clonedElement.style.color = 'black';
+            clonedElement.style.visibility = 'visible';
+            clonedElement.style.opacity = '1';
+            
             clonedDoc.body.style.backgroundColor = 'white';
             
-            const allElements = clonedElement.getElementsByTagName('*');
-            for (let i = 0; i < allElements.length; i++) {
-              const el = allElements[i] as HTMLElement;
+            // Helper to make element and all children visible and black
+            const makeVisible = (el: HTMLElement) => {
               el.style.color = 'black';
-              el.style.backgroundColor = 'transparent'; // Ensure backgrounds don't overlap white text
-              // Fix for potential visibility issues
+              el.style.fill = 'black';
+              el.style.backgroundColor = 'transparent';
               el.style.visibility = 'visible';
               el.style.opacity = '1';
-            }
+              
+              const style = window.getComputedStyle(el);
+              if (style.display === 'none') {
+                el.style.setProperty('display', 'block', 'important');
+              }
+              
+              for (let i = 0; i < el.children.length; i++) {
+                makeVisible(el.children[i] as HTMLElement);
+              }
+            };
+            
+            makeVisible(clonedElement);
 
             const images = clonedElement.getElementsByTagName('img');
             for (let i = 0; i < images.length; i++) {
               images[i].style.display = 'block';
+              images[i].style.visibility = 'visible';
             }
           }
         }
