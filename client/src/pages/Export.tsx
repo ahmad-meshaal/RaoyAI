@@ -54,11 +54,11 @@ export default function Export() {
             
             // Helper to make element and all children visible and black
             const makeVisible = (el: HTMLElement) => {
-              el.style.color = 'black';
-              el.style.fill = 'black';
-              el.style.backgroundColor = 'transparent';
-              el.style.visibility = 'visible';
-              el.style.opacity = '1';
+              el.style.setProperty('color', 'black', 'important');
+              el.style.setProperty('fill', 'black', 'important');
+              el.style.setProperty('background-color', 'white', 'important');
+              el.style.setProperty('visibility', 'visible', 'important');
+              el.style.setProperty('opacity', '1', 'important');
               
               const style = window.getComputedStyle(el);
               if (style.display === 'none') {
@@ -74,8 +74,8 @@ export default function Export() {
 
             const images = clonedElement.getElementsByTagName('img');
             for (let i = 0; i < images.length; i++) {
-              images[i].style.display = 'block';
-              images[i].style.visibility = 'visible';
+              images[i].style.setProperty('display', 'block', 'important');
+              images[i].style.setProperty('visibility', 'visible', 'important');
             }
           }
         }
