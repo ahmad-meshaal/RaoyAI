@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@/components/ui/Layout";
 import { LoadingPage } from "@/components/ui/Loading";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Eye, ThumbsUp, ThumbsDown } from "lucide-react";
+import { BookOpen, Eye, ThumbsUp, ThumbsDown, UserPlus } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Novel } from "@shared/schema";
 
-type PublishedNovel = Novel & { authorUsername: string | null };
+type PublishedNovel = Novel & { authorUsername: string | null; authorAvatarUrl: string | null };
 
 export default function PublicNovels() {
   const { data: novels, isLoading } = useQuery<PublishedNovel[]>({
@@ -27,11 +27,9 @@ export default function PublicNovels() {
   return (
     <Layout>
       <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-12">
-          <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">مكتبة الروايات</h1>
-            <p className="text-muted-foreground text-lg">استكشف أحدث الروايات المنشورة من قبل كتابنا.</p>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-foreground mb-2">مكتبة الروايات</h1>
+          <p className="text-muted-foreground text-lg">استكشف أحدث الروايات المنشورة من قبل كتابنا.</p>
         </div>
 
         {!novels || novels.length === 0 ? (
@@ -48,6 +46,7 @@ export default function PublicNovels() {
                 className="group hover:shadow-xl transition-all duration-300 border-primary/10 overflow-hidden flex flex-col"
                 data-testid={`card-novel-${novel.id}`}
               >
+                {/* Cover Image */}
                 <div className="aspect-[2/3] w-full bg-muted relative overflow-hidden">
                   {novel.coverUrl ? (
                     <img
@@ -60,76 +59,90 @@ export default function PublicNovels() {
                       <BookOpen className="h-20 w-20" />
                     </div>
                   )}
-                  <div className="absolute top-4 right-4">
-                    <Badge variant="secondary" className="bg-white/90 backdrop-blur shadow-sm text-primary hover:bg-white transition-colors">
+                  <div className="absolute top-3 right-3">
+                    <Badge variant="secondary" className="bg-white/90 backdrop-blur shadow-sm text-primary text-xs">
                       {novel.genre}
                     </Badge>
                   </div>
                 </div>
 
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-2xl font-bold group-hover:text-primary transition-colors leading-tight line-clamp-1">
-                    {novel.title}
-                  </CardTitle>
-                </CardHeader>
+                <CardContent className="flex-1 flex flex-col p-4 gap-3">
+                  {/* Author — الأهم */}
+                  {novel.authorUsername ? (
+                    <Link href={`/profile/${novel.authorUsername}`}>
+                      <div
+                        className="flex items-center gap-2 group/author"
+                        data-testid={`link-author-${novel.id}`}
+                      >
+                        <Avatar className="h-8 w-8 border border-primary/20 flex-shrink-0">
+                          <AvatarImage src={novel.authorAvatarUrl || undefined} />
+                          <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary">
+                            {novel.authorUsername.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="text-xs text-muted-foreground leading-none mb-0.5">الكاتب</p>
+                          <p className="text-sm font-semibold text-foreground group-hover/author:text-primary transition-colors truncate">
+                            {novel.authorUsername}
+                          </p>
+                        </div>
+                        <UserPlus className="h-3.5 w-3.5 text-muted-foreground/50 group-hover/author:text-primary transition-colors mr-auto flex-shrink-0" />
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8 border border-muted flex-shrink-0">
+                        <AvatarFallback className="text-xs bg-muted text-muted-foreground">؟</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-xs text-muted-foreground leading-none mb-0.5">الكاتب</p>
+                        <p className="text-sm font-semibold text-muted-foreground">مجهول</p>
+                      </div>
+                    </div>
+                  )}
 
-                <CardContent className="flex-1 flex flex-col">
-                  <p className="text-muted-foreground line-clamp-3 mb-6 leading-relaxed h-20">
+                  {/* Divider */}
+                  <div className="border-t border-border/50" />
+
+                  {/* Title */}
+                  <h3 className="text-lg font-bold group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                    {novel.title}
+                  </h3>
+
+                  {/* Synopsis */}
+                  <p className="text-muted-foreground text-sm line-clamp-2 leading-relaxed flex-1">
                     {novel.synopsis || "لا يوجد ملخص متاح لهذه الرواية."}
                   </p>
 
-                  <div className="flex items-center gap-4 mb-6 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1" data-testid={`text-views-${novel.id}`}>
-                      <Eye className="h-4 w-4" />
-                      <span>{novel.views || 0}</span>
+                  {/* Stats & Read Button */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1" data-testid={`text-views-${novel.id}`}>
+                        <Eye className="h-3.5 w-3.5" />
+                        {novel.views || 0}
+                      </span>
+                      <button
+                        onClick={() => handleAction(novel.id, "like")}
+                        className="flex items-center gap-1 hover:text-primary transition-colors"
+                        data-testid={`button-like-${novel.id}`}
+                      >
+                        <ThumbsUp className="h-3.5 w-3.5" />
+                        {novel.likes || 0}
+                      </button>
+                      <button
+                        onClick={() => handleAction(novel.id, "dislike")}
+                        className="flex items-center gap-1 hover:text-destructive transition-colors"
+                        data-testid={`button-dislike-${novel.id}`}
+                      >
+                        <ThumbsDown className="h-3.5 w-3.5" />
+                        {novel.dislikes || 0}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleAction(novel.id, "like")}
-                      className="flex items-center gap-1 hover:text-primary transition-colors"
-                      data-testid={`button-like-${novel.id}`}
-                    >
-                      <ThumbsUp className="h-4 w-4" />
-                      <span>{novel.likes || 0}</span>
-                    </button>
-                    <button
-                      onClick={() => handleAction(novel.id, "dislike")}
-                      className="flex items-center gap-1 hover:text-destructive transition-colors"
-                      data-testid={`button-dislike-${novel.id}`}
-                    >
-                      <ThumbsDown className="h-4 w-4" />
-                      <span>{novel.dislikes || 0}</span>
-                    </button>
-                  </div>
-
-                  <div className="mt-auto pt-4 border-t border-primary/5 flex items-center justify-between">
-                    {/* Author */}
-                    {novel.authorUsername ? (
-                      <Link href={`/profile/${novel.authorUsername}`}>
-                        <div
-                          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                          data-testid={`link-author-${novel.id}`}
-                        >
-                          <Avatar className="h-6 w-6">
-                            <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                              {novel.authorUsername.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span>{novel.authorUsername}</span>
-                        </div>
-                      </Link>
-                    ) : (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs bg-muted">؟</AvatarFallback>
-                        </Avatar>
-                        <span>كاتب مجهول</span>
-                      </div>
-                    )}
 
                     <Link href={`/novels/${novel.id}/export`} onClick={() => handleAction(novel.id, "view")}>
-                      <Button variant="ghost" className="text-primary hover:bg-primary/5 gap-2" data-testid={`button-read-${novel.id}`}>
-                        قراءة الرواية
-                        <BookOpen className="h-4 w-4" />
+                      <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/5 gap-1 h-8 px-2 text-xs" data-testid={`button-read-${novel.id}`}>
+                        <BookOpen className="h-3.5 w-3.5" />
+                        اقرأ
                       </Button>
                     </Link>
                   </div>

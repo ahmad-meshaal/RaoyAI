@@ -37,7 +37,7 @@ export interface IStorage {
   updateChapter(id: number, chapter: UpdateChapterRequest): Promise<Chapter>;
   deleteChapter(id: number): Promise<void>;
   
-  getPublishedNovelsWithAuthors(): Promise<(Novel & { authorUsername: string | null })[]>;
+  getPublishedNovelsWithAuthors(): Promise<(Novel & { authorUsername: string | null; authorAvatarUrl: string | null })[]>;
 
   // Interactions
   getUserInteraction(userId: number, novelId: number): Promise<UserInteraction | undefined>;
@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(novels).orderBy(desc(novels.createdAt));
   }
 
-  async getPublishedNovelsWithAuthors(): Promise<(Novel & { authorUsername: string | null })[]> {
+  async getPublishedNovelsWithAuthors(): Promise<(Novel & { authorUsername: string | null; authorAvatarUrl: string | null })[]> {
     const rows = await db
       .select({
         id: novels.id,
@@ -100,6 +100,7 @@ export class DatabaseStorage implements IStorage {
         status: novels.status,
         createdAt: novels.createdAt,
         authorUsername: users.username,
+        authorAvatarUrl: users.avatarUrl,
       })
       .from(novels)
       .leftJoin(users, eq(novels.authorId, users.id))
@@ -108,9 +109,27 @@ export class DatabaseStorage implements IStorage {
     return rows as any;
   }
 
-  async getNovel(id: number): Promise<Novel | undefined> {
-    const [novel] = await db.select().from(novels).where(eq(novels.id, id));
-    return novel;
+  async getNovel(id: number): Promise<(Novel & { authorUsername: string | null; authorAvatarUrl: string | null }) | undefined> {
+    const [row] = await db
+      .select({
+        id: novels.id,
+        authorId: novels.authorId,
+        title: novels.title,
+        genre: novels.genre,
+        synopsis: novels.synopsis,
+        coverUrl: novels.coverUrl,
+        views: novels.views,
+        likes: novels.likes,
+        dislikes: novels.dislikes,
+        status: novels.status,
+        createdAt: novels.createdAt,
+        authorUsername: users.username,
+        authorAvatarUrl: users.avatarUrl,
+      })
+      .from(novels)
+      .leftJoin(users, eq(novels.authorId, users.id))
+      .where(eq(novels.id, id));
+    return row as any;
   }
 
   async createNovel(novel: InsertNovel): Promise<Novel> {
