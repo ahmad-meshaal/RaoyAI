@@ -161,9 +161,21 @@ export async function registerRoutes(
   // AI Image generation for novel cover
   app.post("/api/ai/generate-cover", async (req, res) => {
     try {
-      const { title, genre, synopsis } = req.body;
-      if (!title) return res.status(400).json({ message: "عنوان الرواية مطلوب" });
-      const prompt = `Book cover for Arabic novel. Title: "${title}", Genre: "${genre || "fiction"}", Synopsis: "${synopsis || ""}". Style: dramatic, artistic, high quality, book cover design, vibrant colors, no text.`;
+      const { title, genre, synopsis, description } = req.body;
+      let prompt: string;
+      if (description && description.trim()) {
+        // User provided a custom description — use it as the primary prompt
+        prompt = description.trim();
+        if (title) prompt += `. This is a book cover for a novel titled "${title}"`;
+        if (genre) prompt += ` in the ${genre} genre`;
+        prompt += `. No text or typography in the image.`;
+      } else {
+        if (!title) return res.status(400).json({ message: "عنوان الرواية أو وصف الغلاف مطلوب" });
+        prompt = `Book cover illustration for a novel titled "${title}"`;
+        if (genre) prompt += ` in the ${genre} genre`;
+        if (synopsis) prompt += `. The story is about: ${synopsis}`;
+        prompt += `. Dramatic and artistic composition. No text, no typography, no letters in the image.`;
+      }
       const response = await openai.images.generate({
         model: "gpt-image-1",
         prompt,
@@ -182,8 +194,9 @@ export async function registerRoutes(
   app.post("/api/ai/generate-avatar", async (req, res) => {
     try {
       const { description } = req.body;
-      if (!description) return res.status(400).json({ message: "الوصف مطلوب" });
-      const prompt = `Profile avatar portrait: ${description}. Style: artistic, high quality, clean background, professional portrait photo style.`;
+      if (!description || !description.trim()) return res.status(400).json({ message: "الوصف مطلوب" });
+      // Use the user's description directly as the prompt — don't override it
+      const prompt = `${description.trim()}. High quality image, clean background.`;
       const response = await openai.images.generate({
         model: "gpt-image-1",
         prompt,
