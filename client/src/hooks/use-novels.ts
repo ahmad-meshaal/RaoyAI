@@ -67,6 +67,7 @@ export function useDeleteNovel() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [api.novels.list.path] });
+      queryClient.invalidateQueries({ queryKey: ["/api/novels/published"] });
       toast({ title: "تم الحذف", description: "تم حذف الرواية بنجاح" });
     },
   });
@@ -90,6 +91,7 @@ export function useUpdateNovel() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [api.novels.list.path] });
       queryClient.invalidateQueries({ queryKey: [api.novels.get.path, data.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/novels/published"] });
     },
     onError: () => {
       toast({ title: "خطأ", description: "تعذر تحديث الرواية", variant: "destructive" });
