@@ -4,12 +4,12 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { generatePlot, generateChapter } from "./ai_service";
-import { registerChatRoutes } from "./replit_integrations/chat";
-import { registerImageRoutes } from "./replit_integrations/image";
+import { registerChatRoutes } from "./lib/ai/chat";
+import { registerImageRoutes } from "./lib/ai/image";
 import { upload } from "./upload";
 import path from "path";
 import fs from "fs";
-import { openai } from "./replit_integrations/image/client";
+import { openai } from "./lib/ai/image/client";
 
 export async function registerRoutes(
   httpServer: Server,

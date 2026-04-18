@@ -4,3 +4,20 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Local development & IDEs
+.agents
+.config
+.local
+.vscode
+.idea
+
+# Assets & Uploads
+uploads/
+attached_assets/
+extracted_assets/

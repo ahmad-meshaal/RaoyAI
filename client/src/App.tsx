@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "@/context/UserContext";
 
 import Home from "@/pages/Home";
+import LandingPage from "@/pages/LandingPage";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import NovelDashboard from "@/pages/NovelDashboard";
@@ -15,14 +16,25 @@ import Export from "@/pages/Export";
 import Settings from "@/pages/Settings";
 import PublicNovels from "@/pages/PublicNovels";
 import Profile from "@/pages/Profile";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
+import Disclaimer from "@/pages/Disclaimer";
 import NotFound from "@/pages/not-found";
+import { useUser } from "@/context/UserContext";
 
 function Router() {
+  const { user, isLoading } = useUser();
+
   return (
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
-      <Route path="/" component={Home} />
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/disclaimer" component={Disclaimer} />
+      <Route path="/">
+        {() => (user ? <Home /> : <LandingPage />)}
+      </Route>
       <Route path="/novels" component={PublicNovels} />
       <Route path="/novels/:id" component={NovelDashboard} />
       <Route path="/novels/:id/characters" component={Characters} />
