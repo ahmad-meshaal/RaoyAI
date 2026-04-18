@@ -44,7 +44,19 @@ Rawi is a premium, AI-powered writing platform designed specifically for storyte
    npm run dev
    ```
 
+## Deployment (Railway)
+
+The easiest way to deploy Rawi is using [Railway.app](https://railway.app/):
+
+1. **Connect GitHub**: Log in to Railway and create a new project by connecting the `RaoyAI` GitHub repository.
+2. **Provision Database**: Add a PostgreSQL database service in your Railway project.
+3. **Environment Variables**:
+   - `DATABASE_URL`: Automatically linked by Railway if using their Postgres service.
+   - `AI_INTEGRATIONS_OPENAI_API_KEY`: Add your OpenAI Key.
+4. **Deploy**: Railway will automatically detect the configuration and start the server.
+
 ---
+
 
 <h1 id="arabic-version">راوي | Rawi ✍️🤖</h1>
 
