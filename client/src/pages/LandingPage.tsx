@@ -167,6 +167,84 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
+        {/* FAQ Section */}
+        <section className="py-24 bg-card/20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <h2 className="text-4xl font-bold font-heading text-center italic">الأسئلة الشائعة</h2>
+            <div className="space-y-4">
+              {[
+                { 
+                  q: "هل أمتلك حقوق الرواية التي أكتبها باستخدام راوي؟", 
+                  a: "نعم، بالتأكيد. جميع الحقوق الفكرية والإبداعية تظل ملكاً خالصاً للكاتب." 
+                },
+                { 
+                  q: "كيف يساعد الذكاء الاصطناعي في عملية الكتابة؟", 
+                  a: "يساعدك في اقتراح مسارات للحبكة، تطوير صراعات الشخصيات، ووصف المشاهد، لكن القرار النهائي يظل لك دائماً." 
+                },
+                { 
+                  q: "هل يمكنني تصدير روايتي بصيغ جاهزة للطباعة؟", 
+                  a: "نعم، توفر المنصة ميزة التصدير بصيغ احترافية تناسب دور النشر وكتب الـ PDF." 
+                }
+              ].map((faq, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="p-6 bg-card rounded-xl border border-border shadow-sm"
+                >
+                  <h3 className="text-xl font-bold mb-2 text-primary">{faq.q}</h3>
+                  <p className="text-muted-foreground ui-font">{faq.a}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="py-24 border-t border-border/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div className="space-y-6">
+              <h2 className="text-4xl font-bold font-heading italic">تواصل معنا</h2>
+              <p className="text-lg text-muted-foreground ui-font">
+                لديك استفسار أو اقتراح؟ فريق راوي يسعد دائماً بسماع صوت المبدعين.
+              </p>
+              <div className="space-y-4 pt-4 ui-font">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <Feather className="h-6 w-6" />
+                  </div>
+                  <span>support@rawi-ai.com</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <Zap className="h-6 w-6" />
+                  </div>
+                  <span>دعم فني على مدار الساعة</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-card p-8 rounded-3xl border border-border shadow-2xl">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold ui-font">الاسم</label>
+                  <input className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold ui-font">البريد الإلكتروني</label>
+                  <input className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold ui-font">الرسالة</label>
+                  <textarea rows={4} className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary"></textarea>
+                </div>
+                <Button className="w-full h-12 font-bold text-lg">إرسال الرسالة</Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <section className="py-24">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
