@@ -3,8 +3,10 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Footer } from "@/components/Footer";
 import { Feather, Book, Users, Zap, Shield, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LandingPage() {
+  const { toast } = useToast();
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -231,11 +233,9 @@ export default function LandingPage() {
                 e.preventDefault();
                 const target = e.target as HTMLFormElement;
                 target.reset();
-                import("@/hooks/use-toast").then(({ toast }) => {
-                  toast({
-                    title: "تم استلام رسالتك",
-                    description: "سنقوم بالرد عليك في أقرب وقت ممكن.",
-                  });
+                toast({
+                  title: "تم استلام رسالتك",
+                  description: "سنقوم بالرد عليك في أقرب وقت ممكن.",
                 });
               }}
             >
