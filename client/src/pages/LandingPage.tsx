@@ -225,23 +225,36 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-card p-8 rounded-3xl border border-border shadow-2xl">
+            <form 
+              className="bg-card p-8 rounded-3xl border border-border shadow-2xl"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const target = e.target as HTMLFormElement;
+                target.reset();
+                import("@/hooks/use-toast").then(({ toast }) => {
+                  toast({
+                    title: "تم استلام رسالتك",
+                    description: "سنقوم بالرد عليك في أقرب وقت ممكن.",
+                  });
+                });
+              }}
+            >
               <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-bold ui-font">الاسم</label>
-                  <input className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary" />
+                  <input required className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold ui-font">البريد الإلكتروني</label>
-                  <input className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary" />
+                  <input required type="email" className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-bold ui-font">الرسالة</label>
-                  <textarea rows={4} className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary"></textarea>
+                  <textarea required rows={4} className="w-full p-3 rounded-lg bg-background border border-border outline-none focus:ring-1 focus:ring-primary"></textarea>
                 </div>
-                <Button className="w-full h-12 font-bold text-lg">إرسال الرسالة</Button>
+                <Button type="submit" className="w-full h-12 font-bold text-lg">إرسال الرسالة</Button>
               </div>
-            </div>
+            </form>
           </div>
         </section>
 

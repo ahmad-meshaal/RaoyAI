@@ -5,9 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Eye, ThumbsUp, ThumbsDown, UserPlus } from "lucide-react";
+import { BookOpen, Eye, ThumbsUp, ThumbsDown, UserPlus, Search } from "lucide-react";
 import { Link } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import type { Novel } from "@shared/schema";
 
 type PublishedNovel = Novel & { authorUsername: string | null; authorAvatarUrl: string | null };
@@ -16,6 +18,7 @@ export default function PublicNovels() {
   const { data: novels, isLoading } = useQuery<PublishedNovel[]>({
     queryKey: ["/api/novels/published"],
   });
+  const [search, setSearch] = useState("");
 
   if (isLoading) return <LoadingPage />;
 
@@ -27,9 +30,21 @@ export default function PublicNovels() {
   return (
     <Layout>
       <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-2">مكتبة الروايات</h1>
-          <p className="text-muted-foreground text-lg">استكشف أحدث الروايات المنشورة من قبل كتابنا.</p>
+        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">مكتبة الروايات</h1>
+            <p className="text-muted-foreground text-lg">استكشف أحدث الروايات المنشورة من قبل كتابنا.</p>
+          </div>
+          
+          <div className="relative max-w-sm w-full">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="ابحث عن رواية أو تصنيف..." 
+              className="pr-10 text-right bg-card"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
 
         {!novels || novels.length === 0 ? (
@@ -40,7 +55,13 @@ export default function PublicNovels() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {novels.map((novel) => (
+            {novels
+              .filter(n => 
+                n.title.toLowerCase().includes(search.toLowerCase()) || 
+                n.genre.toLowerCase().includes(search.toLowerCase()) ||
+                n.authorUsername?.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((novel) => (
               <Card
                 key={novel.id}
                 className="group hover:shadow-xl transition-all duration-300 border-primary/10 overflow-hidden flex flex-col"

@@ -21,6 +21,11 @@ export async function registerRoutes(
 
   // API Routes
   
+  // Health Check
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Novels
   app.get(api.novels.list.path, async (req, res) => {
     const allNovels = await storage.getNovels();
